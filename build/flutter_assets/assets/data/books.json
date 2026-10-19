@@ -1,0 +1,23 @@
+[
+  {
+    "id": "origin-of-species",
+    "title": "On the Origin of Species",
+    "author": "Charles Darwin",
+    "subject": "Science",
+    "sourceUrl": "https://www.gutenberg.org/ebooks/1228"
+  },
+  {
+    "id": "wealth-of-nations",
+    "title": "The Wealth of Nations",
+    "author": "Adam Smith",
+    "subject": "Economics",
+    "sourceUrl": "https://www.gutenberg.org/ebooks/3300"
+  },
+  {
+    "id": "meditations",
+    "title": "Meditations",
+    "author": "Marcus Aurelius",
+    "subject": "Philosophy",
+    "sourceUrl": "https://www.gutenberg.org/ebooks/2680"
+  }
+]

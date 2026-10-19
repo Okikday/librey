@@ -1,0 +1,20 @@
+[
+  {
+    "id": "darwin-introduction-clue",
+    "bookId": "origin-of-species",
+    "section": "Introduction",
+    "text": "Nor have I been disappointed; in this and in all other perplexing cases I have invariably found that our knowledge, imperfect though it be, of variation under domestication, afforded the best and safest clue. I may venture to express my conviction of the high value of such studies, although they have been very commonly neglected by naturalists. From these considerations, I shall devote the first chapter of this Abstract to Variation under Domestication. We shall thus see that a large amount of hereditary modification is at least possible, and, what is equally or more important, we shall see how great is the power of man in accumulating by his Selection successive slight variations. I will then pass on to the variability of species in a state of nature; but I shall, unfortunately, be compelled to treat this subject far too briefly, as it can be treated properly only by giving long catalogues of facts. We shall, however, be enabled to discuss what circumstances are most favourable to variation. In the next chapter the Struggle for Existence amongst all organic beings throughout the world, which inevitably follows from their high geometrical powers of increase, will be treated of. This is the doctrine of Malthus, applied to the whole animal and vegetable kingdoms. As many more individuals of each species are born than can possibly survive; and as, consequently, there is a frequently recurring struggle for existence, it follows that any being, if it vary however slightly in any manner profitable to itself, under the complex and sometimes varying conditions of life, will have a better chance of surviving, and thus be naturally selected."
+  },
+  {
+    "id": "smith-division-of-labour-invention",
+    "bookId": "wealth-of-nations",
+    "section": "Book I, Chapter I: Of the Division of Labour",
+    "text": "One of the boys, who loved to play with his companions, observed that, by tying a string from the handle of the valve which opened this communication to another part of the machine, the valve would open and shut without his assistance, and leave him at liberty to divert himself with his play-fellows. One of the greatest improvements that has been made upon this machine, since it was first invented, was in this manner the discovery of a boy who wanted to save his own labour."
+  },
+  {
+    "id": "aurelius-book-two-delay",
+    "bookId": "meditations",
+    "section": "Book II, I",
+    "text": "Remember how long thou hast already put off these things, and how often a certain day and hour as it were, having been set unto thee by the gods, thou hast neglected it. It is high time for thee to understand the true nature both of the world, whereof thou art a part; and of that Lord and Governor of the world, from whom, as a channel from the spring, thou thyself didst flow."
+  }
+]

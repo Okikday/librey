@@ -1,0 +1,29 @@
+[
+  {
+    "id": "darwin-start-with-observation",
+    "bookId": "origin-of-species",
+    "passageId": "darwin-introduction-clue",
+    "kind": "Insight",
+    "body": "Big scientific puzzles can start with things you can actually observe. Darwin says studying domesticated plants and animals gave him the “best and safest clue” to how species vary.",
+    "evidenceQuote": "I have invariably found that our knowledge, imperfect though it be, of variation under domestication, afforded the best and safest clue.",
+    "aiGenerated": true
+  },
+  {
+    "id": "smith-boy-inventor",
+    "bookId": "wealth-of-nations",
+    "passageId": "smith-division-of-labour-invention",
+    "kind": "Storytime",
+    "body": "A boy got tired of opening and closing a steam-engine valve, so he rigged it to work by itself and went back to playing. Smith says one of that machine’s biggest improvements started with a kid trying to save his own effort.",
+    "evidenceQuote": "One of the greatest improvements that has been made upon this machine, since it was first invented, was in this manner the discovery of a boy who wanted to save his own labour.",
+    "aiGenerated": true
+  },
+  {
+    "id": "aurelius-stop-postponing",
+    "bookId": "meditations",
+    "passageId": "aurelius-book-two-delay",
+    "kind": "Insight",
+    "body": "A 2,000-year-old call-out for “I’ll do it tomorrow.” Marcus Aurelius reminds himself how many times he has already put things off.",
+    "evidenceQuote": "Remember how long thou hast already put off these things, and how often a certain day and hour as it were, having been set unto thee by the gods, thou hast neglected it.",
+    "aiGenerated": true
+  }
+]
