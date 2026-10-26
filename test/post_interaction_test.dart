@@ -2,19 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:librey/app.dart';
 import 'package:librey/data/demo_content_repository.dart';
-import 'package:librey/screens/feed_screen.dart';
 import 'package:librey/screens/post_detail_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  Finder feedScrollable() => find
-      .descendant(
-        of: find.byType(FeedScreen),
-        matching: find.byType(Scrollable),
-      )
-      .first;
 
   Finder detailScrollable() => find
       .descendant(
@@ -57,15 +49,21 @@ void main() {
     await tester.scrollUntilVisible(
       quizPost,
       300,
-      scrollable: feedScrollable(),
+      scrollable: find.byType(Scrollable).first,
     );
-    await tester.tap(quizPost);
+    final quizCard = find
+        .ancestor(of: quizPost, matching: find.byType(InkWell))
+        .first;
+    await tester.ensureVisible(quizCard);
+    await tester.pumpAndSettle();
+    await tester.tap(quizCard);
     await tester.pumpAndSettle();
 
     final correctAnswer = find.text(
       'More individuals are born than can survive',
     );
-    await tester.tap(correctAnswer);
+    await scrollToTarget(tester, correctAnswer, detailScrollable());
+    await tester.tap(correctAnswer.hitTestable());
     await tester.pumpAndSettle();
     expect(
       find.textContaining('That’s right. Darwin says many more individuals'),

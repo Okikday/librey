@@ -8,6 +8,7 @@ class UserPreferences {
   static const _onboardingCompleteKey = 'librey_onboarding_complete';
   static const _selectedTopicsKey = 'librey_selected_topics';
   static const _followedBooksKey = 'librey_followed_books';
+  static const _topicScoresKey = 'librey_topic_scores';
 
   static Future<UserPreferences> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -45,5 +46,35 @@ class UserPreferences {
     }
     final ordered = ids.toList()..sort();
     await _prefs.setStringList(_followedBooksKey, ordered);
+  }
+
+  Map<String, double> topicScores() {
+    final entries = _prefs.getStringList(_topicScoresKey) ?? const <String>[];
+    final scores = <String, double>{};
+    for (final entry in entries) {
+      final separator = entry.lastIndexOf('|');
+      if (separator <= 0) {
+        throw FormatException('Invalid saved topic score "$entry".');
+      }
+      final topic = entry.substring(0, separator);
+      final score = double.tryParse(entry.substring(separator + 1));
+      if (score == null || !score.isFinite) {
+        throw FormatException('Invalid saved score for "$topic".');
+      }
+      scores[topic] = score;
+    }
+    return Map.unmodifiable(scores);
+  }
+
+  Future<void> recordTopicSignal(String topic, double change) async {
+    if (!change.isFinite) {
+      throw ArgumentError.value(change, 'change', 'Must be finite.');
+    }
+    final scores = Map<String, double>.of(topicScores());
+    scores[topic] = ((scores[topic] ?? 0) + change).clamp(-8, 8).toDouble();
+    final entries =
+        scores.entries.map((entry) => '${entry.key}|${entry.value}').toList()
+          ..sort();
+    await _prefs.setStringList(_topicScoresKey, entries);
   }
 }

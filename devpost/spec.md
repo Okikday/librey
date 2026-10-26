@@ -21,7 +21,7 @@ PRD ref: `prd.md > The Core Journey`.
 
 1. **First visit:** `OnboardingScreen` explains AI provenance and lets the reader pick topics or skip. `ReaderPreferencesStore` saves the choice in this browser.
 2. **For You:** `DemoContentRepository` loads the bundled book and post data. `FeedRanker` uses topic choices and saved local engagement signals to order the feed.
-3. **Browse and interact:** `FeedScreen` renders `PostCard` widgets. Opening a card, dwelling on it, or answering a poll, quiz, or debate updates the app state; the ranking service records relevant topic signals.
+3. **Browse and interact:** `FeedScreen` renders `PostCard` widgets. Opening a card increases its subject affinity; earlier posts passed over to reach it lower those subjects. Spending at least five seconds in a post adds a dwell signal.
 4. **Full post:** `PostDetailScreen` shows the complete card, book follow action, provenance details, and AI demo panel. Following a book updates the saved preferences.
 5. **Ask a question:** `DemoAiPanel` accepts text and displays a prepared sample response associated with the post. The response is explicitly marked as a demo sample, not a live model answer.
 6. **Open the source:** `BookReaderScreen` looks up the post’s `passageId`, shows the matching section with the cited passage highlighted, and offers the original Project Gutenberg source link.
@@ -137,7 +137,7 @@ All book and post content is bundled and read-only; reader state is stored local
 - **Passage:** stable ID, book ID, section/chapter label, exact source text, and a surrounding excerpt used by the reader. The exact text is the text highlighted in the reader.
 - **Post:** stable ID, book ID, passage ID, post kind, text or thread parts, AI provenance, a verbatim supporting evidence quote, optional image asset/attribution, and optional poll/quiz/debate data. Every post must reference an existing book and passage; the evidence quote must occur character-for-character in that passage.
 - **Prepared AI response:** post ID, optional matching sample prompt, answer text, source basis (`book` or `broader knowledge`), and a “prepared demo response” marker. These answers are static fixture data.
-- **Local reader state:** selected topic IDs, followed book IDs, and per-topic engagement scores. Poll/quiz selections and open chat text may remain in memory for the current app session; they are not account data and need not sync.
+- **Local reader state:** selected topic IDs, followed book IDs, and clamped per-topic engagement scores. Opening a post, dwell, and posts passed over when opening a later item update those scores. Poll/quiz selections and typed questions remain in memory for the current app session; they are not account data and need not sync.
 - **Image attribution:** image asset path, source page, creator, and license/attribution text.
 
 `shared_preferences` is browser-local and best-effort, not a secure store or cross-device database. If it is empty or unavailable, use unselected topics, no followed books, and the balanced all-subject starting feed.
@@ -146,8 +146,9 @@ All book and post content is bundled and read-only; reader state is stored local
 
 - Run `flutter analyze` and `flutter test`.
 - `demo_content_test.dart` checks that every post references a real bundled book and passage, every evidence quote occurs exactly in its passage, every required post kind has a demo fixture, and prepared answers identify whether they use the book or broader knowledge.
-- `feed_ranker_test.dart` checks that selected topics influence initial order, engagement can raise a topic, repeated skips can lower it, discovery remains available, and Following excludes non-followed books.
+- `feed_ranker_test.dart` checks that selected topics influence initial order, engagement can raise a topic, repeated skips can lower it, a discovery slot remains available, and a book does not repeat within three cards.
 - `core_journey_test.dart` checks optional onboarding, opening a post and returning, poll/quiz/debate selection states, opening a cited passage, the AI demo label and prepared response, book following, and empty Following.
+- `feed_responsive_test.dart` checks the feed renders without layout exceptions at desktop and narrow/mobile widths.
 - Check the feed at desktop and mobile viewport widths to verify the sidebar/top-bar layouts and visible For You/Following tabs.
 
 ## File Structure

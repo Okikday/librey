@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/demo_content_repository.dart';
+import '../data/feed_ranker.dart';
 import '../data/user_preferences.dart';
 import '../models/post.dart';
 import '../widgets/dashed_divider.dart';
@@ -90,6 +91,7 @@ class _FeedColumn extends StatelessWidget {
   final UserPreferences preferences;
   final ValueChanged<FeedTab> onTabSelected;
   final VoidCallback onPostReturned;
+  static const _ranker = FeedRanker();
 
   List<Post> _postsForTab() {
     final selectedTopics = preferences.selectedTopics();
@@ -102,24 +104,12 @@ class _FeedColumn extends StatelessWidget {
       return followedPosts;
     }
 
-    final orderedPosts = List<Post>.of(repository.posts);
-    if (selectedTopics.isEmpty) {
-      return orderedPosts;
-    }
-
-    orderedPosts.sort((left, right) {
-      final leftMatch = selectedTopics.contains(
-        repository.bookFor(left).subject,
-      );
-      final rightMatch = selectedTopics.contains(
-        repository.bookFor(right).subject,
-      );
-      if (leftMatch == rightMatch) {
-        return 0;
-      }
-      return leftMatch ? -1 : 1;
-    });
-    return orderedPosts;
+    return _ranker.rank(
+      posts: repository.posts,
+      subjectFor: (post) => repository.bookFor(post).subject,
+      selectedTopics: selectedTopics,
+      topicScores: preferences.topicScores(),
+    );
   }
 
   @override
@@ -188,7 +178,19 @@ class _FeedColumn extends StatelessWidget {
                           post: post,
                           book: book,
                           onTap: () async {
-                            await Navigator.of(context).push(
+                            final navigator = Navigator.of(context);
+                            for (final passedPost in posts.take(index)) {
+                              await preferences.recordTopicSignal(
+                                repository.bookFor(passedPost).subject,
+                                -0.5,
+                              );
+                            }
+                            await preferences.recordTopicSignal(
+                              book.subject,
+                              1,
+                            );
+                            final dwell = Stopwatch()..start();
+                            await navigator.push(
                               MaterialPageRoute<void>(
                                 builder: (_) => PostDetailScreen(
                                   post: post,
@@ -197,6 +199,12 @@ class _FeedColumn extends StatelessWidget {
                                 ),
                               ),
                             );
+                            if (dwell.elapsed >= const Duration(seconds: 5)) {
+                              await preferences.recordTopicSignal(
+                                book.subject,
+                                1,
+                              );
+                            }
                             if (context.mounted) {
                               onPostReturned();
                             }
@@ -417,13 +425,17 @@ class _NavigationItem extends StatelessWidget {
             color: selected ? const Color(0xFF426A52) : const Color(0xFF778078),
           ),
           const SizedBox(width: 12),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: selected
-                  ? const Color(0xFF304D3C)
-                  : const Color(0xFF616B63),
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: selected
+                    ? const Color(0xFF304D3C)
+                    : const Color(0xFF616B63),
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
             ),
           ),
         ],

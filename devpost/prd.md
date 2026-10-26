@@ -51,12 +51,13 @@ Source: `scope.md > Inspiration & Identity`; further direction from the PRD inte
 ### Topic Onboarding and For You
 
 - Readers can choose interests such as economics, computer science, and arts, or skip topic selection.
-- For You starts with posts related to the selected interests. While the reader browses, dwell time and clicks provide signals: the feed tests other topics and gradually shows less of topics the reader consistently skips.
+- For You starts with posts related to the selected interests. Opening posts and spending time in them increases a topic's local affinity; passing earlier posts to open a later one lowers affinity for the skipped topics.
 - The feed remains varied across the selected areas and includes occasional exploration outside a reader’s initial choices.
-- The exact signal weights and dwell threshold are not product requirements; the observable behavior is that relevant engagement influences subsequent recommendations.
+- Topic affinity persists in this browser. The exact signal weights and dwell threshold are not product requirements; the observable behavior is that engagement influences later recommendations, while every sixth slot can introduce a topic outside the selected interests and no book repeats within three cards.
 - **Acceptance criteria**
   - [ ] Onboarding allows selecting topics or skipping directly to For You.
   - [ ] For You initially includes posts related to selected topics; after the reader engages with one topic and passes over another, a later feed shows the described adjustment.
+  - [ ] The feed preserves a discovery slot and avoids repeating a book within three cards.
 
 Source: `scope.md > The Core Loop`, `scope.md > The POC Boundary`.
 

@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Select a topic, follow a book from its full post, reload, and open Following. Confirm the choices remain on this browser and only followed-book posts appear; then unfollow and inspect the empty state.
   Commit: `Add onboarding and book following`
 
-- [ ] **3. Interact with varied posts and the prepared AI demo**
+- [x] **3. Interact with varied posts and the prepared AI demo**
   Becomes usable: The feed includes all six post kinds, a minority of attributed image cards, a few longer posts, working poll/quiz/debate interactions, and a clearly labelled prepared-answer panel on every post.
   Why now: The core source path and reader choices are already usable. This adds the entertaining variety and post-level interactions without introducing a server or implying live AI.
   PRD ref: `prd.md > Grounded, Varied Posts`, `prd.md > Full Post, AI Context, and Source Reading`, `prd.md > States and Boundaries`, `prd.md > Look and Feel`
