@@ -46,7 +46,8 @@ class _FeedScreenState extends State<FeedScreen> {
                       if (!desktop)
                         _MobileTopBar(
                           activeTab: _activeTab,
-                          onTabSelected: (tab) => setState(() => _activeTab = tab),
+                          onTabSelected: (tab) =>
+                              setState(() => _activeTab = tab),
                         ),
                       Expanded(
                         child: Center(
@@ -56,7 +57,9 @@ class _FeedScreenState extends State<FeedScreen> {
                               activeTab: _activeTab,
                               repository: widget.repository,
                               preferences: widget.preferences,
-                              onTabSelected: (tab) => setState(() => _activeTab = tab),
+                              onTabSelected: (tab) =>
+                                  setState(() => _activeTab = tab),
+                              onPostReturned: () => setState(() {}),
                             ),
                           ),
                         ),
@@ -79,12 +82,14 @@ class _FeedColumn extends StatelessWidget {
     required this.repository,
     required this.preferences,
     required this.onTabSelected,
+    required this.onPostReturned,
   });
 
   final FeedTab activeTab;
   final DemoContentRepository repository;
   final UserPreferences preferences;
   final ValueChanged<FeedTab> onTabSelected;
+  final VoidCallback onPostReturned;
 
   List<Post> _postsForTab() {
     final selectedTopics = preferences.selectedTopics();
@@ -103,8 +108,12 @@ class _FeedColumn extends StatelessWidget {
     }
 
     orderedPosts.sort((left, right) {
-      final leftMatch = selectedTopics.contains(repository.bookFor(left).subject);
-      final rightMatch = selectedTopics.contains(repository.bookFor(right).subject);
+      final leftMatch = selectedTopics.contains(
+        repository.bookFor(left).subject,
+      );
+      final rightMatch = selectedTopics.contains(
+        repository.bookFor(right).subject,
+      );
       if (leftMatch == rightMatch) {
         return 0;
       }
@@ -156,7 +165,8 @@ class _FeedColumn extends StatelessWidget {
                   ),
                 ],
                 selected: {activeTab},
-                onSelectionChanged: (selection) => onTabSelected(selection.first),
+                onSelectionChanged: (selection) =>
+                    onTabSelected(selection.first),
                 showSelectedIcon: false,
               ),
             ],
@@ -177,8 +187,8 @@ class _FeedColumn extends StatelessWidget {
                         PostCard(
                           post: post,
                           book: book,
-                          onTap: () {
-                            Navigator.of(context).push(
+                          onTap: () async {
+                            await Navigator.of(context).push(
                               MaterialPageRoute<void>(
                                 builder: (_) => PostDetailScreen(
                                   post: post,
@@ -187,6 +197,9 @@ class _FeedColumn extends StatelessWidget {
                                 ),
                               ),
                             );
+                            if (context.mounted) {
+                              onPostReturned();
+                            }
                           },
                         ),
                         if (index != posts.length - 1) const DashedDivider(),
@@ -223,9 +236,9 @@ class _FollowingEmptyState extends StatelessWidget {
               activeTab == FeedTab.following
                   ? 'No followed books yet'
                   : 'Nothing matched this view',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
@@ -233,9 +246,9 @@ class _FollowingEmptyState extends StatelessWidget {
               activeTab == FeedTab.following
                   ? 'Follow a book from its full post, and its reading feed will appear here.'
                   : 'Try switching back to For You for a broader mix.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF697669),
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF697669)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -246,10 +259,7 @@ class _FollowingEmptyState extends StatelessWidget {
 }
 
 class _DesktopSidebar extends StatelessWidget {
-  const _DesktopSidebar({
-    required this.activeTab,
-    required this.onTabSelected,
-  });
+  const _DesktopSidebar({required this.activeTab, required this.onTabSelected});
 
   final FeedTab activeTab;
   final ValueChanged<FeedTab> onTabSelected;
@@ -307,10 +317,7 @@ class _DesktopSidebar extends StatelessWidget {
 }
 
 class _MobileTopBar extends StatelessWidget {
-  const _MobileTopBar({
-    required this.activeTab,
-    required this.onTabSelected,
-  });
+  const _MobileTopBar({required this.activeTab, required this.onTabSelected});
 
   final FeedTab activeTab;
   final ValueChanged<FeedTab> onTabSelected;
