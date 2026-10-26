@@ -76,11 +76,43 @@ class PostCard extends StatelessWidget {
               const SizedBox(height: 15),
               Text(
                 post.body,
+                maxLines: post.isArticle ? 6 : null,
+                overflow: post.isArticle ? TextOverflow.ellipsis : null,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   height: 1.55,
                   letterSpacing: -0.1,
                 ),
               ),
+              if (post.imageAsset case final imageAsset?) ...[
+                const SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    imageAsset,
+                    width: double.infinity,
+                    height: 205,
+                    fit: BoxFit.cover,
+                    semanticLabel: 'Original illustration for ${book.title}',
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  post.imageAttribution!,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: const Color(0xFF7C857D),
+                  ),
+                ),
+              ],
+              if (post.kind == 'Thread' && post.threadParts.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  '${post.threadParts.length} parts · Open to read the thread',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: const Color(0xFF426A52),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
               const SizedBox(height: 16),
               Row(
                 children: [

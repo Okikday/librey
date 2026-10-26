@@ -2,10 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:librey/app.dart';
 import 'package:librey/data/demo_content_repository.dart';
+import 'package:librey/screens/post_detail_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  Finder feedTab(String label) => find.descendant(
+    of: find.byWidgetPredicate((widget) => widget is SegmentedButton),
+    matching: find.text(label),
+  );
+
+  Finder detailScrollable() => find
+      .descendant(
+        of: find.byType(PostDetailScreen),
+        matching: find.byType(Scrollable),
+      )
+      .first;
 
   testWidgets(
     'reader can choose topics, follow a book, and open its exact source',
@@ -24,14 +37,26 @@ void main() {
       expect(find.text('For You'), findsWidgets);
       expect(find.text('On the Origin of Species'), findsWidgets);
 
-      await tester.tap(find.text('Following'));
+      await tester.tap(feedTab('Following'));
       await tester.pumpAndSettle();
       expect(find.text('No followed books yet'), findsOneWidget);
 
-      await tester.tap(find.text('For You').last);
+      await tester.tap(feedTab('For You'));
       await tester.pumpAndSettle();
-      await tester.tap(find.textContaining('Big scientific puzzles'));
+      expect(find.text('No followed books yet'), findsNothing);
+      expect(find.textContaining('Big scientific puzzles'), findsOneWidget);
+      final darwinPost = find.textContaining('Big scientific puzzles');
+      await tester.ensureVisible(darwinPost);
+      await tester.tap(
+        find.ancestor(of: darwinPost, matching: find.byType(InkWell)).first,
+      );
       await tester.pumpAndSettle();
+      expect(find.text('Post'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Open source book'),
+        300,
+        scrollable: detailScrollable(),
+      );
       expect(find.text('Open source book'), findsOneWidget);
 
       await tester.tap(find.text('Follow'));
@@ -40,7 +65,7 @@ void main() {
       await tester.tap(find.byTooltip('Back to feed'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Following'));
+      await tester.tap(feedTab('Following'));
       await tester.pumpAndSettle();
       expect(find.text('On the Origin of Species'), findsWidgets);
       expect(find.textContaining('A boy got tired of opening'), findsNothing);
@@ -48,6 +73,11 @@ void main() {
 
       await tester.tap(find.textContaining('Big scientific puzzles'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Open source book'),
+        300,
+        scrollable: detailScrollable(),
+      );
       expect(find.text('Open source book'), findsOneWidget);
 
       await tester.tap(find.text('Open source book'));
@@ -60,7 +90,13 @@ void main() {
 
       await tester.tap(find.byTooltip('Back to post'));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(FilledButton, 'Following'));
+      await tester.tap(find.byTooltip('Back to feed'));
+      await tester.pumpAndSettle();
+      await tester.tap(feedTab('Following'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Big scientific puzzles'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Following'));
       await tester.pumpAndSettle();
       final updatedPreferences = await SharedPreferences.getInstance();
       expect(
@@ -68,8 +104,6 @@ void main() {
         isEmpty,
       );
       await tester.tap(find.byTooltip('Back to feed'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Following').last);
       await tester.pumpAndSettle();
       expect(find.text('No followed books yet'), findsOneWidget);
 

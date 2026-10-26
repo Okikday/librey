@@ -74,6 +74,44 @@ class DemoContentRepository {
           'Post "${post.id}" evidence quote does not match its source passage.',
         );
       }
+      if (post.contextSummary == null ||
+          post.sampleQuestion == null ||
+          post.sampleAnswer == null ||
+          !const {'book', 'broader knowledge'}.contains(post.answerBasis)) {
+        throw FormatException(
+          'Post "${post.id}" must include a prepared answer and its source basis.',
+        );
+      }
+      if (post.kind == 'Quote' && post.body != post.evidenceQuote) {
+        throw FormatException(
+          'Quote post "${post.id}" must reproduce its evidence exactly.',
+        );
+      }
+      if (post.kind == 'Thread' && post.threadParts.length < 2) {
+        throw FormatException(
+          'Thread post "${post.id}" must include at least two parts.',
+        );
+      }
+      if (const {'Poll', 'Quiz', 'Debate'}.contains(post.kind) &&
+          (post.question == null || post.options.length < 2)) {
+        throw FormatException(
+          '${post.kind} post "${post.id}" must include a question and at least two options.',
+        );
+      }
+      if (post.kind == 'Quiz' &&
+          (post.correctOptionIndex == null ||
+              post.correctOptionIndex! < 0 ||
+              post.correctOptionIndex! >= post.options.length ||
+              post.explanation == null)) {
+        throw FormatException(
+          'Quiz post "${post.id}" must include a valid answer and explanation.',
+        );
+      }
+      if ((post.imageAsset == null) != (post.imageAttribution == null)) {
+        throw FormatException(
+          'Post "${post.id}" must provide both an image and its attribution.',
+        );
+      }
     }
   }
 
