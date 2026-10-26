@@ -56,18 +56,18 @@ Build mode: fast
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship. Awaiting explicit ready-to-ship confirmation; no issues or changes were reported.
+- [x] Final review complete — learner confirmed the proof of concept is ready for final review; no issues or changes were reported.
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — connect the learner’s agent-workflow goal to one actual planning decision, test, or implementation path
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — connect the learner’s agent-workflow goal to one actual planning decision, test, or implementation path
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [record actual activity, evidence, and any unfinished work]
-Route and stops: [record actual paths and symbols visited, or reference-only route]
-Edit outcome: [record tried/kept/reverted/declined/not applicable and verification]
-Reflection: [record offered/answered/declined/already covered]
-Activity mode: [record live app/editor, static fallback, focused alternative, prior practice, or recap]
+Activity and evidence: Focused evidence-based recap: feed-ranking work exposed a brittle quiz widget test that assumed the quiz remained on screen; the interaction was updated to scroll to the lazy-built card, and all 11 tests passed. The user accepted this focus; no claim of independent code navigation or learning is made.
+Route and stops: Reference-only route in `devpost/app-map.html`: `devpost/prd.md > Topic Onboarding and For You` → `lib/screens/feed_screen.dart > _FeedColumn._postsForTab` → `lib/data/feed_ranker.dart > FeedRanker.rank` → `test/feed_ranker_test.dart`.
+Edit outcome: No optional edit; not applicable to the focused recap and deadline.
+Reflection: Optional transfer question offered with the app map; response not required.
+Activity mode: Focused alternative / evidence-based recap with the app running; editor route provided as a reference, not toured interactively.
 
 ## Revisions

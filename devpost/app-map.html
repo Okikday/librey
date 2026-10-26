@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LibreY — App Map</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #202923;
+        --muted: #657168;
+        --leaf: #426a52;
+        --line: #dce5dc;
+        --paper: #fcfdfb;
+        --tint: #edf3ed;
+      }
+      * { box-sizing: border-box; }
+      body {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 36px 22px 56px;
+        background: var(--paper);
+        color: var(--ink);
+        font: 16px/1.6 system-ui, sans-serif;
+      }
+      h1, h2, h3 { line-height: 1.25; }
+      h1 { margin-bottom: 8px; font-size: clamp(2rem, 6vw, 3rem); }
+      h2 { margin-top: 34px; font-size: 1.35rem; }
+      h3 { margin-bottom: 6px; font-size: 1rem; }
+      p { margin: 8px 0 14px; }
+      a { color: #315b40; text-underline-offset: 3px; }
+      code {
+        padding: 2px 5px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: #f5f8f4;
+        font: 0.92em ui-monospace, monospace;
+      }
+      .lede, .muted { color: var(--muted); }
+      .panel {
+        margin-top: 18px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+      }
+      .route {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .stop {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: white;
+      }
+      .step {
+        display: inline-grid;
+        width: 26px;
+        height: 26px;
+        margin-bottom: 6px;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--tint);
+        color: var(--leaf);
+        font-weight: 700;
+      }
+      svg { display: block; width: 100%; height: auto; }
+      .map-box { fill: var(--tint); stroke: var(--line); }
+      .map-title { fill: var(--ink); font: 600 15px system-ui, sans-serif; }
+      .map-copy { fill: var(--muted); font: 13px system-ui, sans-serif; }
+      .map-arrow { fill: none; stroke: var(--leaf); stroke-width: 2; }
+      .practice { border-left: 4px solid var(--leaf); }
+      @media (max-width: 620px) {
+        body { padding: 26px 16px 40px; }
+        .route { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p class="muted">A small guide to the working proof of concept</p>
+      <h1>LibreY app map</h1>
+      <p class="lede">A text-led social feed where posts point to their exact passage in public-domain books. The feed, source reader, and reader preferences are bundled or stored locally; no server or live AI service is involved.</p>
+    </header>
+
+    <section class="panel" aria-labelledby="flow-heading">
+      <h2 id="flow-heading">One action, from signal to feed</h2>
+      <p>Opening a post adds a local signal for its book's subject. The next For You build uses topic affinity, keeps a discovery slot, and avoids repeating a book within three cards.</p>
+      <svg viewBox="0 0 780 150" role="img" aria-labelledby="diagram-title diagram-description">
+        <title id="diagram-title">How a post open changes the For You feed</title>
+        <desc id="diagram-description">The reader opens a post. FeedScreen records its topic signal in local preferences. FeedRanker orders posts. The updated order appears in For You.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#426a52"></path>
+          </marker>
+        </defs>
+        <rect class="map-box" x="4" y="34" width="160" height="78" rx="12"></rect>
+        <text class="map-title" x="18" y="64">Open a post</text>
+        <text class="map-copy" x="18" y="87">reader action</text>
+        <path class="map-arrow" marker-end="url(#arrow)" d="M168 73 H208"></path>
+        <rect class="map-box" x="216" y="34" width="174" height="78" rx="12"></rect>
+        <text class="map-title" x="230" y="64">FeedScreen</text>
+        <text class="map-copy" x="230" y="87">records topic signals</text>
+        <path class="map-arrow" marker-end="url(#arrow)" d="M394 73 H434"></path>
+        <rect class="map-box" x="442" y="34" width="154" height="78" rx="12"></rect>
+        <text class="map-title" x="456" y="64">FeedRanker</text>
+        <text class="map-copy" x="456" y="87">orders the posts</text>
+        <path class="map-arrow" marker-end="url(#arrow)" d="M600 73 H640"></path>
+        <rect class="map-box" x="648" y="34" width="128" height="78" rx="12"></rect>
+        <text class="map-title" x="662" y="64">For You</text>
+        <text class="map-copy" x="662" y="87">updated feed</text>
+      </svg>
+    </section>
+
+    <section aria-labelledby="route-heading">
+      <h2 id="route-heading">Reference route through the code</h2>
+      <p class="muted">This is a reference route for reopening later, not a claim that you toured the editor.</p>
+      <div class="route">
+        <article class="stop">
+          <span class="step">1</span>
+          <h3>Feed entry and signals</h3>
+          <p><a href="../lib/screens/feed_screen.dart"><code>lib/screens/feed_screen.dart</code></a> — find <code>_FeedColumn._postsForTab</code> to see the ranking inputs, then <code>PostCard.onTap</code> to see post-open, skip, and dwell signals.</p>
+        </article>
+        <article class="stop">
+          <span class="step">2</span>
+          <h3>Ordering rules</h3>
+          <p><a href="../lib/data/feed_ranker.dart"><code>lib/data/feed_ranker.dart</code></a> — <code>FeedRanker.rank</code> applies topic affinity, discovery, and book diversity.</p>
+        </article>
+        <article class="stop">
+          <span class="step">3</span>
+          <h3>Evidence and persistence</h3>
+          <p><a href="../test/feed_ranker_test.dart"><code>test/feed_ranker_test.dart</code></a> checks order changes and diversity; <a href="../lib/data/user_preferences.dart"><code>lib/data/user_preferences.dart</code></a> stores bounded topic scores in this browser.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="change-heading">
+      <h2 id="change-heading">To change this, start here</h2>
+      <ul>
+        <li>Feed ranking rules: <code>FeedRanker.rank</code> in <code>lib/data/feed_ranker.dart</code>; update the matching checks in <code>test/feed_ranker_test.dart</code>.</li>
+        <li>Bundled books and posts: the JSON files under <code>assets/data/</code>; source grounding is checked in <code>test/demo_content_test.dart</code>.</li>
+        <li>Post details and poll/quiz/debate controls: <code>lib/screens/post_detail_screen.dart</code> and the post interaction widget tests.</li>
+        <li>Responsive navigation: <code>lib/screens/feed_screen.dart</code> and <code>test/feed_responsive_test.dart</code>.</li>
+      </ul>
+    </section>
+
+    <section class="panel practice" aria-labelledby="practice-heading">
+      <h2 id="practice-heading">A practice to reuse</h2>
+      <p>The PRD defines observable feed behavior; <code>feed_ranker_test.dart</code> turns it into checks for selected interests, engagement, skips, discovery, and diversity. On another project, anchor an agent's implementation to observable criteria and tests rather than trusting that code merely looks plausible.</p>
+    </section>
+
+    <section aria-labelledby="run-heading">
+      <h2 id="run-heading">Run it again</h2>
+      <p>From the repository root, run <code>flutter pub get</code>, then <code>flutter run -d web-server --web-port 7357</code> and open <code>http://localhost:7357</code>. The app-map works offline and has no script or network dependencies.</p>
+      <p class="muted">Code snapshot: commit <code>94ba247</code>. This guide is a snapshot too; update its paths and behavior notes if the app changes.</p>
+    </section>
+
+    <footer class="muted">
+      <p><a href="./checklist.md">Return to the build checklist</a>.</p>
+    </footer>
+  </body>
+</html>
