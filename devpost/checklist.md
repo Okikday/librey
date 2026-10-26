@@ -39,7 +39,7 @@ Build mode: fast
   Learner check: Try a poll and quiz, open the AI panel on a post, type a question, and inspect the sample/source labels. Confirm the feed still feels mostly text-led and natural.
   Commit: `Add post interactions and AI demo`
 
-- [ ] **4. Adapt For You and verify the complete responsive journey**
+- [x] **4. Adapt For You and verify the complete responsive journey**
   Becomes usable: For You visibly adjusts its balanced, discovery-preserving order from topic choices, post opens, dwell, and repeated skips; the complete experience is verified at desktop and mobile sizes.
   Why now: Ranking needs the topics and engagement interactions from earlier slices. Keeping it last avoids building a recommender before there is a real feed to rank, while still completing the approved demo behavior.
   PRD ref: `prd.md > The Core Journey`, `prd.md > Screens and Layout`, `prd.md > Topic Onboarding and For You`, `prd.md > Book-Following Feed`, `prd.md > Grounded, Varied Posts`, `prd.md > Full Post, AI Context, and Source Reading`
@@ -52,11 +52,11 @@ Build mode: fast
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 1, try the grounded feed-to-source journey and share design/content feedback before onboarding and ranking are added.
-- [ ] Final kick-the-tires exploration and feedback completed — after slice 4, explore the complete desktop and mobile journey, including awkward or empty states.
+- [x] Final kick-the-tires exploration and feedback completed — after slice 4, explore the complete desktop and mobile journey, including awkward or empty states. Learner feedback: nothing is broken; no changes requested.
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [ ] Final review complete — feedback resolved and learner confirms ready to ship. Awaiting explicit ready-to-ship confirmation; no issues or changes were reported.
 
 ## Code Tour and App Map
 
