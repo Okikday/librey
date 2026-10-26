@@ -9,7 +9,7 @@ Build mode: fast
 
 ## Slices
 
-- [ ] **1. Browse a grounded post and open its real book passage**
+- [x] **1. Browse a grounded post and open its real book passage**
   Becomes usable: A running Flutter Web app opens to a readable, responsive feed of bundled posts and opens a selected post at its exact, highlighted passage in a focused reader.
   Why now: This is LibreY’s distinctive feed-to-source promise. It comes first so the first working increment proves the kernel rather than building generic scaffolding. Project setup, responsive shell, bundled data, and source verification are included in this vertical slice.
   PRD ref: `prd.md > The Core Journey`, `prd.md > Screens and Layout`, `prd.md > Grounded, Varied Posts`, `prd.md > Full Post, AI Context, and Source Reading`
@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Open the local app, choose a post, then open its source. Check that the post feels like a natural feed item and that the highlighted passage is the real text behind it.
   Commit: `Build grounded feed and source reader`
 
-- [ ] **2. Choose interests and follow books across visits**
+- [x] **2. Choose interests and follow books across visits**
   Becomes usable: First-use readers can choose topics or skip, select For You or Following, follow a book from its full post, and retain topic/follow choices in this browser.
   Why now: These choices personalize the reader’s next visit and give Following its clear book-based meaning; they build on the working post and source from slice 1.
   PRD ref: `prd.md > The Core Journey`, `prd.md > Screens and Layout`, `prd.md > Topic Onboarding and For You`, `prd.md > Book-Following Feed`, `prd.md > States and Boundaries`
@@ -51,7 +51,7 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 1, try the grounded feed-to-source journey and share design/content feedback before onboarding and ranking are added.
+- [x] Early usable behavior explored — after slice 1, try the grounded feed-to-source journey and share design/content feedback before onboarding and ranking are added.
 - [ ] Final kick-the-tires exploration and feedback completed — after slice 4, explore the complete desktop and mobile journey, including awkward or empty states.
 
 ## Final Review

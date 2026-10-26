@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
 
 import '../data/demo_content_repository.dart';
+import '../data/user_preferences.dart';
 import '../models/post.dart';
 import 'book_reader_screen.dart';
 
-class PostDetailScreen extends StatelessWidget {
+class PostDetailScreen extends StatefulWidget {
   const PostDetailScreen({
     super.key,
     required this.post,
     required this.repository,
+    required this.preferences,
   });
 
   final Post post;
   final DemoContentRepository repository;
+  final UserPreferences preferences;
+
+  @override
+  State<PostDetailScreen> createState() => _PostDetailScreenState();
+}
+
+class _PostDetailScreenState extends State<PostDetailScreen> {
+  late bool _isFollowing;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFollowing = widget.preferences.followedBookIds().contains(widget.post.bookId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final book = repository.bookFor(post);
-    final passage = repository.passageFor(post);
+    final book = widget.repository.bookFor(widget.post);
+    final passage = widget.repository.passageFor(widget.post);
 
     return Scaffold(
       appBar: AppBar(
@@ -56,11 +72,15 @@ class PostDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  FilledButton.tonal(
+                    onPressed: _toggleFollowState,
+                    child: Text(_isFollowing ? 'Following' : 'Follow'),
+                  ),
                 ],
               ),
               const SizedBox(height: 26),
               Text(
-                post.kind.toUpperCase(),
+                widget.post.kind.toUpperCase(),
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: const Color(0xFF426A52),
                   fontWeight: FontWeight.w700,
@@ -69,7 +89,7 @@ class PostDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                post.body,
+                widget.post.body,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   height: 1.42,
                   letterSpacing: -0.4,
@@ -78,7 +98,7 @@ class PostDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 22),
               Text(
-                'This post was ${post.aiGenerated ? 'AI-generated' : 'reader-created'}.',
+                'This post was ${widget.post.aiGenerated ? 'AI-generated' : 'reader-created'}.',
                 style: Theme.of(
                   context,
                 ).textTheme.bodySmall?.copyWith(color: const Color(0xFF7C857D)),
@@ -121,7 +141,7 @@ class PostDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                post.evidenceQuote,
+                widget.post.evidenceQuote,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   height: 1.55,
                   fontStyle: FontStyle.italic,
@@ -130,6 +150,21 @@ class PostDetailScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> _toggleFollowState() async {
+    final nextValue = !_isFollowing;
+    await widget.preferences.setFollowedBook(widget.post.bookId, nextValue);
+    if (!mounted) return;
+    setState(() => _isFollowing = nextValue);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          nextValue ? 'Following ${widget.repository.bookFor(widget.post).title}' : 'Unfollowed ${widget.repository.bookFor(widget.post).title}',
+        ),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }

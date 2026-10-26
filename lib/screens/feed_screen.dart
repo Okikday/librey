@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
 
 import '../data/demo_content_repository.dart';
+import '../data/user_preferences.dart';
 import '../models/post.dart';
 import '../widgets/dashed_divider.dart';
 import '../widgets/post_card.dart';
 import 'post_detail_screen.dart';
 
-class FeedScreen extends StatelessWidget {
-  const FeedScreen({super.key, required this.repository});
+enum FeedTab { forYou, following }
+
+class FeedScreen extends StatefulWidget {
+  const FeedScreen({
+    super.key,
+    required this.repository,
+    required this.preferences,
+  });
 
   final DemoContentRepository repository;
+  final UserPreferences preferences;
+
+  @override
+  State<FeedScreen> createState() => _FeedScreenState();
+}
+
+class _FeedScreenState extends State<FeedScreen> {
+  FeedTab _activeTab = FeedTab.forYou;
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +35,28 @@ class FeedScreen extends StatelessWidget {
             final desktop = constraints.maxWidth >= 960;
             return Row(
               children: [
-                if (desktop) const _DesktopSidebar(),
+                if (desktop)
+                  _DesktopSidebar(
+                    activeTab: _activeTab,
+                    onTabSelected: (tab) => setState(() => _activeTab = tab),
+                  ),
                 Expanded(
                   child: Column(
                     children: [
-                      if (!desktop) const _MobileTopBar(),
+                      if (!desktop)
+                        _MobileTopBar(
+                          activeTab: _activeTab,
+                          onTabSelected: (tab) => setState(() => _activeTab = tab),
+                        ),
                       Expanded(
                         child: Center(
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 690),
                             child: _FeedColumn(
-                              posts: repository.posts,
-                              repository: repository,
+                              activeTab: _activeTab,
+                              repository: widget.repository,
+                              preferences: widget.preferences,
+                              onTabSelected: (tab) => setState(() => _activeTab = tab),
                             ),
                           ),
                         ),
@@ -49,23 +74,63 @@ class FeedScreen extends StatelessWidget {
 }
 
 class _FeedColumn extends StatelessWidget {
-  const _FeedColumn({required this.posts, required this.repository});
+  const _FeedColumn({
+    required this.activeTab,
+    required this.repository,
+    required this.preferences,
+    required this.onTabSelected,
+  });
 
-  final List<Post> posts;
+  final FeedTab activeTab;
   final DemoContentRepository repository;
+  final UserPreferences preferences;
+  final ValueChanged<FeedTab> onTabSelected;
+
+  List<Post> _postsForTab() {
+    final selectedTopics = preferences.selectedTopics();
+    final followedBooks = preferences.followedBookIds();
+
+    if (activeTab == FeedTab.following) {
+      final followedPosts = repository.posts
+          .where((post) => followedBooks.contains(post.bookId))
+          .toList(growable: false);
+      return followedPosts;
+    }
+
+    final orderedPosts = List<Post>.of(repository.posts);
+    if (selectedTopics.isEmpty) {
+      return orderedPosts;
+    }
+
+    orderedPosts.sort((left, right) {
+      final leftMatch = selectedTopics.contains(repository.bookFor(left).subject);
+      final rightMatch = selectedTopics.contains(repository.bookFor(right).subject);
+      if (leftMatch == rightMatch) {
+        return 0;
+      }
+      return leftMatch ? -1 : 1;
+    });
+    return orderedPosts;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final posts = _postsForTab();
+    final title = activeTab == FeedTab.forYou ? 'For You' : 'Following';
+    final subtitle = activeTab == FeedTab.forYou
+        ? 'A little scroll. A little wiser.'
+        : 'Books you follow, in one place.';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 26, 24, 18),
+          padding: const EdgeInsets.fromLTRB(24, 26, 24, 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'For You',
+                title,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.6,
@@ -73,60 +138,121 @@ class _FeedColumn extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'A little scroll. A little wiser.',
+                subtitle,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: const Color(0xFF6E776F),
                 ),
               ),
-              const SizedBox(height: 16),
-              Container(
-                width: 58,
-                height: 3,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF426A52),
-                  borderRadius: BorderRadius.circular(4),
-                ),
+              const SizedBox(height: 14),
+              SegmentedButton<FeedTab>(
+                segments: const [
+                  ButtonSegment<FeedTab>(
+                    value: FeedTab.forYou,
+                    label: Text('For You'),
+                  ),
+                  ButtonSegment<FeedTab>(
+                    value: FeedTab.following,
+                    label: Text('Following'),
+                  ),
+                ],
+                selected: {activeTab},
+                onSelectionChanged: (selection) => onTabSelected(selection.first),
+                showSelectedIcon: false,
               ),
             ],
           ),
         ),
         const DashedDivider(),
         Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 22),
-            itemCount: posts.length,
-            itemBuilder: (context, index) {
-              final post = posts[index];
-              final book = repository.bookFor(post);
-              return Column(
-                children: [
-                  PostCard(
-                    post: post,
-                    book: book,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => PostDetailScreen(
-                            post: post,
-                            repository: repository,
-                          ),
+          child: posts.isEmpty
+              ? _FollowingEmptyState(activeTab: activeTab)
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  itemCount: posts.length,
+                  itemBuilder: (context, index) {
+                    final post = posts[index];
+                    final book = repository.bookFor(post);
+                    return Column(
+                      children: [
+                        PostCard(
+                          post: post,
+                          book: book,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => PostDetailScreen(
+                                  post: post,
+                                  repository: repository,
+                                  preferences: preferences,
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                  if (index != posts.length - 1) const DashedDivider(),
-                ],
-              );
-            },
-          ),
+                        if (index != posts.length - 1) const DashedDivider(),
+                      ],
+                    );
+                  },
+                ),
         ),
       ],
     );
   }
 }
 
+class _FollowingEmptyState extends StatelessWidget {
+  const _FollowingEmptyState({required this.activeTab});
+
+  final FeedTab activeTab;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.bookmark_border_rounded,
+              size: 42,
+              color: Color(0xFF6E776F),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              activeTab == FeedTab.following
+                  ? 'No followed books yet'
+                  : 'Nothing matched this view',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              activeTab == FeedTab.following
+                  ? 'Follow a book from its full post, and its reading feed will appear here.'
+                  : 'Try switching back to For You for a broader mix.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: const Color(0xFF697669),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _DesktopSidebar extends StatelessWidget {
-  const _DesktopSidebar();
+  const _DesktopSidebar({
+    required this.activeTab,
+    required this.onTabSelected,
+  });
+
+  final FeedTab activeTab;
+  final ValueChanged<FeedTab> onTabSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -141,12 +267,24 @@ class _DesktopSidebar extends StatelessWidget {
         children: [
           const _Brand(),
           const SizedBox(height: 42),
-          const _NavigationItem(
-            icon: Icons.dynamic_feed_outlined,
-            label: 'For You',
-            selected: true,
+          GestureDetector(
+            onTap: () => onTabSelected(FeedTab.forYou),
+            child: _NavigationItem(
+              icon: Icons.dynamic_feed_outlined,
+              label: 'For You',
+              selected: activeTab == FeedTab.forYou,
+            ),
           ),
           const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => onTabSelected(FeedTab.following),
+            child: _NavigationItem(
+              icon: Icons.bookmark_outline,
+              label: 'Following',
+              selected: activeTab == FeedTab.following,
+            ),
+          ),
+          const SizedBox(height: 18),
           Text(
             'GOOD TO KNOW',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -169,7 +307,13 @@ class _DesktopSidebar extends StatelessWidget {
 }
 
 class _MobileTopBar extends StatelessWidget {
-  const _MobileTopBar();
+  const _MobileTopBar({
+    required this.activeTab,
+    required this.onTabSelected,
+  });
+
+  final FeedTab activeTab;
+  final ValueChanged<FeedTab> onTabSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -252,6 +396,7 @@ class _NavigationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 160,
       padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
       decoration: BoxDecoration(
         color: selected ? const Color(0xFFEAF1EA) : Colors.transparent,
